@@ -16,10 +16,8 @@ module.exports = {
   // get one user
   getSingleUser(req, res) {
     User.findOne({ _id: req.params._id })
-      .populate({ 
-        path: 'thoughts',
-        select: '-__v' 
-      })
+      .populate('thoughts')
+      .populate('friends')
       .select('-__v')
       .then((userData) => res.json(userData))
       .catch((err) => res.status(500).json(err));
@@ -39,5 +37,22 @@ module.exports = {
       .then((userData) => res.json(userData))
       .catch((err) => res.status(500).json(err));
   },
-
+  // add friend
+  addFriend(req, res) {
+    User.findOneAndUpdate(
+      { id: req.params.id },
+      { $push: { friends: req.params.friendId } },
+    )
+      .then((friendsData) => res.json(friendsData))
+      .catch((err) => res.status(500).json(err));
+  },
+  // remove friend
+  removeFriend(req, res) {
+    User.findOneAndUpdate(
+      { id: req.params.id },
+      { $push: { friends: req.params.friendId } },
+    )
+      .then((friendsData) => res.json(friendsData))
+      .catch((err) => res.status(500).json(err));
+  },
 }

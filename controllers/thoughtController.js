@@ -4,11 +4,10 @@ const User = require('../models/User');
 module.exports = {
   // create and add thought to user
   addThought(req, res) {
-    console.log(req.body);
     Thought.create(req.body)
       .then((thought) => {
-        console.log(thought._id);
         return User.findOneAndUpdate(
+          { username: thought.username },
           { $push: { thoughts: thought._id } },
         )
       })
