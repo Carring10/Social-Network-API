@@ -9,6 +9,7 @@ module.exports = {
         return User.findOneAndUpdate(
           { username: thought.username },
           { $push: { thoughts: thought._id } },
+          { new: true }
         )
       })
       .then((thoughtsData) => res.json(thoughtsData))
@@ -35,6 +36,7 @@ module.exports = {
     Thought.updateOne(
       { _id: req.params._id },
       { $set: req.body },
+      { new: true }
     )
       .then((thoughtData) => res.json(thoughtData))
       .catch((err) => res.status(500).json(err));
@@ -52,6 +54,7 @@ module.exports = {
     Thought.findOneAndUpdate(
       { id: req.params.thoughtId },
       { $push: { reactions: req.body } },
+      { new: true }
     )
       .then((thoughtData) => res.json(thoughtData))
       .catch((err) => res.status(500).json(err));
@@ -62,6 +65,7 @@ module.exports = {
     Thought.findOneAndUpdate(
       { id: req.params.thoughtId },
       { $pull: { reactions: req.body } },
+      { new: true }
     )
       .then((thoughtData) => res.json(thoughtData))
       .catch((err) => res.status(500).json(err));

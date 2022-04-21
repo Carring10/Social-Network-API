@@ -1,3 +1,4 @@
+const Thought = require('../models/Thought');
 const User = require('../models/User');
 
 module.exports = {
@@ -17,7 +18,8 @@ module.exports = {
 
   // get one user
   getSingleUser(req, res) {
-    User.findOne({ _id: req.params._id })
+    console.log(req.params)
+    User.findOne({ _id: req.params.userId })
       .populate('thoughts')
       .populate('friends')
       .select('-__v')
@@ -28,25 +30,32 @@ module.exports = {
   // update user
   updateUser(req, res) {
     User.updateOne(
-      { _id: req.params._id },
+      { _id: req.params.userId },
       { $set: req.body },
+      { new: true }
     )
       .then((userData) => res.json(userData))
       .catch((err) => res.status(500).json(err));
   },
 
-  // delete user
+  // delete user and it's comments
   deleteUser(req, res) {
-    User.deleteOne({ _id: req.params._id })
-      .then((userData) => res.json(userData))
+    console.log(req.params)
+    User.deleteOne({ _id: req.params.userId })
+      .then(() => {
+        console.log(req.params)
+        return Thought.deleteMany({ id: { $in: req.params.userId } })
+      })
+      .then((data) => res.json(data))
       .catch((err) => res.status(500).json(err));
   },
 
   // add friend
   addFriend(req, res) {
     User.findOneAndUpdate(
-      { id: req.params.id },
+      { _id: req.params.userId },
       { $push: { friends: req.params.friendId } },
+      { $new: true }
     )
       .then((friendsData) => res.json(friendsData))
       .catch((err) => res.status(500).json(err));
@@ -55,8 +64,9 @@ module.exports = {
   // remove friend
   removeFriend(req, res) {
     User.findOneAndUpdate(
-      { id: req.params.id },
+      { _id: req.params.userId },
       { $pull: { friends: req.params.friendId } },
+      { new: true }
     )
       .then((friendsData) => res.json(friendsData))
       .catch((err) => res.status(500).json(err));
